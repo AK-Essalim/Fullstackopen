@@ -1,0 +1,27 @@
+title 0.4 uusi muistiinpano - Abdelkarim Essalim
+Käyttäjä->Selain: 
+note left of Selain:
+Käyttäjä kirjoittaa form-lomakkeen tekstialueelle
+uuden muistiinpanon ja painaa Save-nappia
+end note
+Selain->Palvelin: POST https://studies.cs.helsinki.fi/exampleapp/new_note, lomakkeen sisältö 
+note right of Palvelin:
+Palvelin tallettaa uuden muistiinpanon
+taulukkoon, joka pitää sen sisällään
+end note
+Palvelin->Selain: status 302, uudelleenohjauspyyntö osoitteeseen /notes
+Selain->Palvelin: GET fullstack-exampleapp.herokuapp.com/notes
+Palvelin->Selain: status 200, sivun html
+Selain->Palvelin: GET fullstack-exampleapp.herokuapp.com/main.css
+Palvelin->Selain: status 200, sivun css
+Selain->Palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
+Palvelin->Selain: status 200, main.js tiedosto
+note right of Selain: 
+javascript tiedosto aihettaa vielä GET-pyynnön data.json tiedostolle
+end note
+Selain->Palvelin: GET https://fullstack-exampleapp.herokuapp.com/data.json
+Palvelin->Selain: status 200, data.json-tiedosto
+
+note left of Selain:
+Selain näyttää Palvelimen palauttaman HTML:n, jota on stailattu CSS:llä ja 
+manipuloitu javascriptillä lisäämällä data.json tiedoston sisästämää dataa, mm. uusi muistiinpano

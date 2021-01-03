@@ -1,0 +1,19 @@
+title 0.6 uusi muistiinpano - SPA - Abdelkarim Essalim
+Käyttäjä->Selain: 
+note left of Selain:
+Käyttäjä kirjoittaa form-lomakkeen tekstialueelle
+uuden muistiinpanon ja painaa Save-nappia
+end note
+note over Selain: Selain suorittaa js-koodia, joka hakee oikean elementin ja lisää tapahtumakäsittelijän lähetys-tilanteelle.
+end note 
+note over Selain: Selain Estää oletustoiminnan
+end note
+note over Selain: Selain suorittaa js-koodia, joka lisää viestin taulukkoon.
+end note
+note over Selain: Selain päivittää näytölle oikeanlaisen listan muistiinpanoista.
+end note
+note over Selain: Selain lähettää uuden muistiinpanon palvelimelle.
+end note
+Selain -> Palvelin: HTTP POST Request https://studies.cs.helsinki.fi/exampleapp/new_note_spa, JSON-payload
+note left of Palvelin: Palvelin tallettaa muistiinpanon taulukkoon
+Palvelin -> Selain: HTTP 201 Created, JSON: {"message":"note created"}

@@ -1,0 +1,21 @@
+title 0.5 Vierailu - SPA - Abdelkarim Essalim
+Käyttäjä->Selain: 
+note left of Selain:
+Käyttäjä kirjoittaa Selaimen osoiteriville osoitteen:
+https://studies.cs.helsinki.fi/exampleapp/spa 
+ja painaa enter
+end note over 
+Selain -> Palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/spa 
+Palvelin -> Selain: HTTP code 200, sivun HTML
+Selain -> Palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css 
+Palvelin -> Selain: HTTP code 200, sivun CSS
+Selain -> Palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/spa.js
+Palvelin -> Selain: HTTP code 200, sivun JS
+Selain -> Palvelin:
+note left of Selain: Suoritettava JS aiheuttaa vielä HTTP GET-pyynnön
+Selain -> Palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+Palvelin -> Selain: HTTP koodi 200, data.json-tiedoston data
+note over Selain:
+Suoritettava js-koodi vastaanottaa saadun datan ja käyttää sitä listan luomiseen ja selainikkunaan piirtämiseen.
+end note
+
