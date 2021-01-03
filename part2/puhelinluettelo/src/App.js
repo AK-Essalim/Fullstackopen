@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import People from "./Components/People";
+import PersonForm from "./Components/PersonForm";
+import Filter from "./Components/Filter";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -16,7 +18,6 @@ const App = () => {
     e.preventDefault();
     const names = [];
     persons.forEach((person) => names.push(person.name));
-    console.log(names);
     if (!names.includes(newName)) {
       console.log("button clicked", e.target);
       const nameObject = {
@@ -26,7 +27,7 @@ const App = () => {
 
       setPersons(persons.concat(nameObject));
       setNewName("");
-      console.log(persons);
+      setNewNumber("");
     } else {
       alert(`${newName} is already added in the phonebook`);
     }
@@ -48,23 +49,20 @@ const App = () => {
 
   return (
     <div>
-      <div>
-        filter shown with{" "}
-        <input value={filterValue} onChange={handleFilterValueChange} />
-      </div>
+      <Filter
+        handleFilterValueChange={handleFilterValueChange}
+        filterValue={filterValue}
+      />
 
-      <form onSubmit={addName}>
-        <h3>add a new contact</h3>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <h3>add a new contact</h3>
+      <PersonForm
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        addName={addName}
+        newName={newName}
+        newNumber={newNumber}
+      />
+
       <h2>Numbers</h2>
       <People persons={FilteredPeople} />
     </div>
