@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import People from "./Components/People";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -19,8 +20,8 @@ const App = () => {
     if (!names.includes(newName)) {
       console.log("button clicked", e.target);
       const nameObject = {
-        name: newName,
-        number: newNumber,
+        name: newName.trim(),
+        number: newNumber.trim(),
       };
 
       setPersons(persons.concat(nameObject));
@@ -40,6 +41,10 @@ const App = () => {
   const handleFilterValueChange = (e) => {
     setFilterValue(e.target.value);
   };
+
+  const FilteredPeople = persons.filter((people) =>
+    people.name.toLowerCase().includes(filterValue.toLowerCase())
+  );
 
   return (
     <div>
@@ -61,11 +66,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {persons.map((person) => (
-        <p key={person.name}>
-          {person.name} {person.number}
-        </p>
-      ))}
+      <People persons={FilteredPeople} />
     </div>
   );
 };
