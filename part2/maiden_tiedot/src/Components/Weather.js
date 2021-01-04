@@ -18,7 +18,9 @@ const Weather = ({ city, country }) => {
           temperature: data.current.temperature,
           icon: data.current.weather_icons[0],
           windSpeed: data.current.wind_speed,
-          windDirection: data.current.wind_dir,
+          humidity: data.current.humidity,
+          clouds: data.current.cloudcover,
+          visibility: data.current.visibility,
         });
       })
       .catch((err) => console.log(err));
@@ -32,7 +34,10 @@ const Weather = ({ city, country }) => {
       <h3>Current Weather</h3>
       <p>The temperature at the moment is {weather.temperature} Celsius</p>
       <img src={weather.icon} alt="weather_icon" />
-      <p>The Wind Speed is {weather.windSpeed}</p>
+      <p>The Wind Speed is {weather.humidity}</p>
+      <p>The Humidity is {weather.windSpeed}</p>
+      <p>The Cloudcover is {weather.clouds}</p>
+      <p>The visibility is {weather.visibility}</p>
     </div>
   ) : null;
 };
