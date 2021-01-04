@@ -27,7 +27,6 @@ const Weather = ({ city, country }) => {
 
     setIsWeather(true);
   }, [country]);
-  console.log(weather);
 
   return isWeather ? (
     <div>

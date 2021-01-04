@@ -8,9 +8,7 @@ const App = () => {
   const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
-    console.log("effect");
     axios.get("https://restcountries.eu/rest/v2/all").then((response) => {
-      console.log(typeof response);
       setCountries(response.data);
     });
   }, []);
@@ -20,9 +18,7 @@ const App = () => {
         country.name.toLowerCase().includes(filterValue.toLowerCase())
       )
     );
-  }, [filterValue]);
-
-  console.log("render", countries.length, "countries");
+  }, [filterValue, countries]);
 
   const handleFilterChange = (e) => {
     setFilterValue(e.target.value);
@@ -30,8 +26,7 @@ const App = () => {
 
   return (
     <div>
-      find countries
-      <input value={filterValue} onChange={handleFilterChange} />
+      find countries <input value={filterValue} onChange={handleFilterChange} />
       <Countries
         countries={filteredCountries}
         setFilterValue={setFilterValue}

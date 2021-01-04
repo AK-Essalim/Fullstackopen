@@ -1,46 +1,29 @@
 import React from "react";
 import axios from "axios";
 import Weather from "./Weather";
+import CountriesList from "./CountriesList";
+import CountryView from "./CountryView";
 
 const Countries = ({ countries, setFilterValue }) => {
   if (countries.length > 1 && countries.length < 11) {
     return (
       <div>
-        {countries.map((country) => (
-          <p key={country.name}>
-            {country.name}
-            <button
-              onClick={() => {
-                setFilterValue(country.name);
-              }}
-            >
-              View Country
-            </button>
-          </p>
-        ))}
+        <CountriesList countries={countries} setFilterValue={setFilterValue} />
       </div>
     );
   } else if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>;
   } else if (countries.length === 1) {
     return (
-      <div>
-        <h1>{countries[0].name}</h1>
-        <h3>Capital {countries[0].capital}</h3>
-        <p>Population {countries[0].population}</p>
-        <h3>Languages</h3>
-        <ul>
-          {countries[0].languages.map((language) => {
-            return <li key={language.name}>{language.name}</li>;
-          })}
-        </ul>
-        <img src={countries[0].flag} width="150" alt=""></img>
-        <Weather city={countries[0].capital} country={countries.length} />
-      </div>
+      <>
+        <CountryView
+          country={countries[0]}
+          countriesLength={countries.length}
+        />
+      </>
     );
-  } else {
-    return <p></p>;
   }
+  return null;
 };
 
 export default Countries;
