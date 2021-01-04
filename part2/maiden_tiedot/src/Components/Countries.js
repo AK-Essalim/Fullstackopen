@@ -1,6 +1,8 @@
 import React from "react";
+import axios from "axios";
+import Weather from "./Weather";
 
-const App = ({ countries, setFilterValue }) => {
+const Countries = ({ countries, setFilterValue }) => {
   if (countries.length > 1 && countries.length < 11) {
     return (
       <div>
@@ -33,6 +35,7 @@ const App = ({ countries, setFilterValue }) => {
           })}
         </ul>
         <img src={countries[0].flag} width="150" alt=""></img>
+        <Weather city={countries[0].capital} />
       </div>
     );
   } else {
@@ -40,4 +43,4 @@ const App = ({ countries, setFilterValue }) => {
   }
 };
 
-export default App;
+export default Countries;
