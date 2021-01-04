@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const Weather = ({ city }) => {
+const Weather = ({ city, country }) => {
   const [weather, setWeather] = useState({});
   const [isWeather, setIsWeather] = useState(false);
 
@@ -24,7 +24,7 @@ const Weather = ({ city }) => {
       .catch((err) => console.log(err));
 
     setIsWeather(true);
-  }, []);
+  }, [country]);
   console.log(weather);
 
   return isWeather ? (

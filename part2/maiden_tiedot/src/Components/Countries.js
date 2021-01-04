@@ -35,7 +35,7 @@ const Countries = ({ countries, setFilterValue }) => {
           })}
         </ul>
         <img src={countries[0].flag} width="150" alt=""></img>
-        <Weather city={countries[0].capital} />
+        <Weather city={countries[0].capital} country={countries.length} />
       </div>
     );
   } else {
