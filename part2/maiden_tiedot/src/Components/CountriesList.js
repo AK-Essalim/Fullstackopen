@@ -6,13 +6,12 @@ const CountriesList = ({ countries, setFilterValue }) => {
     <div>
       {countries.map((country) => (
         <p key={country.name}>
-          {country.name}
+          {country.name}{" "}
           <button
             onClick={() => {
               setFilterValue(country.name);
             }}
           >
-            {" "}
             View Country
           </button>
         </p>
