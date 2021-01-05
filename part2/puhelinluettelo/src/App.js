@@ -3,12 +3,16 @@ import People from "./components/People";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 import PersonService from "./services/personService";
+import Notification from "./components/Notification";
+import "./App.css";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterValue, setFilterValue] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     PersonService.getAll()
@@ -54,12 +58,23 @@ const App = () => {
               person.id !== id ? person : responsePerson
             )
           );
+          setNotificationMessage(`The number of ${newName} has been updated!`);
+          setTimeout(() => {
+            setNotificationMessage(null);
+          }, 5000);
         });
       }
+      return;
     }
 
     setPersons(persons.concat(nameObject));
     PersonService.addPerson(nameObject);
+    setNotificationMessage(
+      `Person ${nameObject.name} has been added to the Phonebook`
+    );
+    setTimeout(() => {
+      setNotificationMessage(null);
+    }, 5000);
     setNewName("");
     setNewNumber("");
   };
@@ -81,10 +96,27 @@ const App = () => {
       `Are you sure you want to delete ${deleted.name}?`
     );
     if (confirmDelete) {
-      PersonService.deletePerson(id).then(() => {
-        const updatedList = persons.filter((person) => person.id !== id);
-        setPersons(updatedList);
-      });
+      PersonService.deletePerson(id)
+        .then(() => {
+          const updatedList = persons.filter((person) => person.id !== id);
+          setPersons(updatedList);
+          setNotificationMessage(
+            `Person ${deleted.name} has been deleted from the Phonebook`
+          );
+          setTimeout(() => {
+            setNotificationMessage(null);
+          }, 5000);
+        })
+        .catch((err) => {
+          console.log(err);
+          setErrorMessage(
+            `Person ${deleted.name} has already been deleted from server`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+          setPersons(persons.filter((p) => p.id !== id));
+        });
     }
   };
 
@@ -92,8 +124,14 @@ const App = () => {
     people.name.toLowerCase().includes(filterValue.toLowerCase())
   );
 
+  const error = "error";
   return (
     <div>
+      <h1>Phonebook</h1>
+      {notificationMessage && <Notification message={notificationMessage} />}
+      {errorMessage && (
+        <Notification message={errorMessage} className={error} />
+      )}
       <Filter
         handleFilterValueChange={handleFilterValueChange}
         filterValue={filterValue}

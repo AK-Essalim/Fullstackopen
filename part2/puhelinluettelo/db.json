@@ -16,11 +16,6 @@
       "id": 5
     },
     {
-      "name": "Osama",
-      "number": "My friend",
-      "id": 6
-    },
-    {
       "name": "Arto Hellas",
       "number": "1234567",
       "id": 7
@@ -31,20 +26,9 @@
       "id": 8
     },
     {
-      "name": "asas",
-      "number": "987654321",
-      "id": 19,
-      "newNumber": "54321"
-    },
-    {
-      "name": "asas",
-      "number": "4321",
-      "id": 20
-    },
-    {
-      "name": "asas",
-      "number": "987654321",
-      "id": 21
+      "name": "Osama",
+      "number": "0401234556",
+      "id": 10
     }
   ]
 }
