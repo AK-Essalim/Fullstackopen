@@ -30,22 +30,18 @@ const App = () => {
       return;
     }
 
-    const existingPerson = persons.some(
-      (person) => person.name === nameObject.name
-    );
+    const existingPerson = persons.some((person) => person.name === newName);
     if (existingPerson) {
-      const newPerson = persons.find(
-        (person) => person.name === nameObject.name
-      );
+      const newPerson = persons.find((person) => person.name === newName);
 
+      const newDetails = { ...newPerson, number: newNumber };
+      const { id } = newPerson;
       console.log(
         "existing person: ",
         existingPerson,
         "new Person: ",
         newPerson
       );
-      const newDetails = { ...newPerson, newNumber };
-      const { id } = newPerson;
 
       const confirmUpdate = window.confirm(
         `${newName} has already been added to phonebook, update number?`
