@@ -10,17 +10,17 @@ blogsRouter.get("/", async (req, res) => {
 
 // Get a Single Blog
 
-blogsRouter.get("/:id", (req, res, next) => {
-  Blog.findById(req.params.id)
-    .then((blog) => {
-      if (blog) {
-        res.json(blog);
-        console.log(
-          `Received a request for the details a blog titled : ${blog.title}`
-        );
-      }
-    })
-    .catch((err) => next(err));
+blogsRouter.get("/:id", async (req, res, next) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (blog) {
+      res.json(blog.toJSON());
+    } else {
+      res.status(404).end();
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
 //Create a new Blog
@@ -44,7 +44,7 @@ blogsRouter.post("/", async (req, res, next) => {
 
 //Update a single Blog
 
-blogsRouter.put("/:id", (req, res, next) => {
+blogsRouter.put("/:id", async (req, res, next) => {
   const body = req.body;
 
   const blog = {
