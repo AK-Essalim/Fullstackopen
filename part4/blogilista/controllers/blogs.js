@@ -1,5 +1,6 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
+const test = require("../utils/for_testing");
 
 //Get all blogs
 blogsRouter.get("/", (req, res) => {
