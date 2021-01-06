@@ -84,4 +84,10 @@ describe("total likes", () => {
 
     expect(result).toBe(arr[0].likes);
   });
+  test("of a bigger list is calculated correctly", () => {
+    const arr = [];
+    const result = listHelper.totalLikes(blogs);
+
+    expect(result).toBe(36);
+  });
 });
