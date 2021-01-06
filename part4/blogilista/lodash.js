@@ -57,3 +57,5 @@ const blogs = [
 console.log(blogs);
 console.log("väliä");
 console.log(_.sortBy(blogs, ["likes"]));
+let v = _.countBy(blogs, (a) => a.author);
+console.log(v);
