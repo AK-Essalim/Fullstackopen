@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const mongoUrl = process.env.MONGODB_URI;
 
@@ -8,6 +9,8 @@ const blogSchema = mongoose.Schema({
   url: String,
   likes: Number,
 });
+
+blogSchema.plugin(uniqueValidator);
 
 blogSchema.set("toJSON", {
   transform: (document, returnedObject) => {
