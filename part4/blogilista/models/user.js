@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
-const { use } = require("../controllers/blogs");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const userSchema = mongoose.Schema({
   username: { type: String, unique: true, required: true },
   name: String,
-  passwordHash: { type: String, required: true },
+  passwordHash: String,
   blogs: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Blog",
-      default: [],
     },
   ],
 });
+
+userSchema.plugin(uniqueValidator);
 
 userSchema.set("toJSON", {
   transform: (document, returnedObject) => {
@@ -25,7 +25,6 @@ userSchema.set("toJSON", {
   },
 });
 
-userSchema.plugin(uniqueValidator);
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

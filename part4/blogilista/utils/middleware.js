@@ -15,12 +15,17 @@ const unknownEndpoint = (request, response) => {
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message);
 
-  if (error.name === "CastError") {
+  if (error.name === "CastError" && error.kind === "ObjectId") {
     return response.status(400).send({ error: "malformatted id" });
-  } else if (error.name === "ValidationError") {
+  } else if (error.name === "ValidationError" || error.name === "error") {
     return response.status(400).json({ error: error.message });
   }
 
+  if (error.name === "JsonWebTokenError") {
+    return response.status(401).json({ error: "Access Denied" });
+  }
+
+  console.error(error.message);
   next(error);
 };
 

@@ -1,11 +1,26 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
-const test = require("../utils/for_testing");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+const config = require("../utils/config");
+
+const getTokenFrom = (request) => {
+  const authorization = request.get("Authorization");
+  //console.log("akalaka", authorization);
+  //console.log(authorization, "here in get tokenFrom");
+  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
+    //console.log(authorization.substring(7), "here in if statement");
+    return authorization.substring(7);
+  }
+  return null;
+};
 
 //Get all blogs
 blogsRouter.get("/", async (req, res) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate("user", {
+    username: 1,
+    name: 1,
+  });
   res.json(blogs.map((blog) => blog.toJSON()));
 });
 
@@ -21,10 +36,21 @@ blogsRouter.get("/:id", async (req, res, next) => {
 });
 
 //Create a new Blog
-blogsRouter.post("/", async (req, res, next) => {
+blogsRouter.post("/", async (req, res) => {
   const body = req.body;
+  //console.log("hi", req.token);
+  const token = req.headers.authorization.split(" ")[1];
+  try {
+    const decoded = jwt.verify(JSON.parse(token), privateKey);
+    console.log(decoded);
+  } catch (err) {
+    console.log("err", err);
+  }
 
-  const user = await User.findById(body.userId);
+  if (!token || !decodedToken.id) {
+    return res.status(401).json({ error: "token missing or not valid" });
+  }
+  const user = await User.findById(decodedToken.id);
 
   const blog = new Blog({
     title: body.title,
@@ -44,7 +70,7 @@ blogsRouter.post("/", async (req, res, next) => {
 
 //Update a single Blog
 
-blogsRouter.put("/:id", async (req, res, next) => {
+blogsRouter.put("/:id", async (req, res) => {
   const body = req.body;
 
   const blog = {
@@ -56,8 +82,6 @@ blogsRouter.put("/:id", async (req, res, next) => {
 
   const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
     new: true,
-    runValidators: true,
-    context: "query",
   });
   res.status(200).json(updatedBlog.toJSON());
 });

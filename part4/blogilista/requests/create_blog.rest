@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/blogs HTTP/1.1
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI1ZmY2OWRjZTg3MWE2ZjRmMGZmNmIxNDYiLCJpYXQiOjE2MTAwMDIwMzB9.i_lP5RQ6vkObbM1PCkfGNC_AkPQbsPU_Vzc2N6ZDvMo
+
+{
+    "title": "in year 3000",
+    "author": "Peter Petrelli",
+    "url": "localhost:3002",
+    "likes": 32
+}
