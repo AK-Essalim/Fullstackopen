@@ -6,7 +6,6 @@ const api = supertest(app);
 const helper = require("./test_helper");
 
 const Blog = require("../models/blog");
-const { map } = require("../app");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -94,6 +93,18 @@ test("blog can be deleted", async () => {
   const blogsAtEnd = await helper.blogsInDb();
 
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+});
+
+test("the value of likes is set to 0 if it is not specified", async () => {
+  const newBlog = {
+    title: "Akalaka",
+    author: "Hela",
+    url: "http://freedomFromSchool.com",
+  };
+
+  const responseBlog = await api.post("/api/blogs").send(newBlog).expect(200);
+  console.log(responseBlog.body);
+  expect(responseBlog.body.likes).toEqual(0);
 });
 
 afterAll(() => {
