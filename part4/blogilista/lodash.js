@@ -54,8 +54,43 @@ const blogs = [
   },
 ];
 
-console.log(blogs);
+/* console.log(blogs);
 console.log("väliä");
-console.log(_.sortBy(blogs, ["likes"]));
-let v = _.countBy(blogs, (a) => a.author);
-console.log(v);
+console.log(_.sortBy(blogs, ["likes"])); */
+let v = _.sortBy(blogs, (a) => a.author);
+//console.log(v);
+let q = _.groupBy(blogs, (blog) => blog.author);
+
+Object.entries(v).map((a) => console.log(a).length);
+
+const byAuthor = _.groupBy(blogs, (blog) => blog.author);
+const authors = _.map(byAuthor, (auth) => {
+  const likes = auth.reduce((total, blog) => total + blog.likes, 0);
+  return { author: auth[0].author, likes: likes };
+});
+/* console.log(
+  authors.reduce((max, auth) => (max.likes > auth.likes ? max : auth), {})
+); */
+
+/* 
+const authorCount = _.reduce(
+  blogs,
+  (total, next) => {
+    total[next.author] = (total[next.author] || 0) + 1;
+    return total;
+  },
+  {}
+);
+
+const counts = blogs.reduce((s, v) => {
+  s[v.author] = (s[v.author] || 0) + 1;
+  return s;
+}, {});
+console.log(
+  _.reduce(
+    counts,
+    (s, v, i) => (!s || v > s.blogs ? { author: i, blogs: v } : s),
+    null
+  )
+);
+ */

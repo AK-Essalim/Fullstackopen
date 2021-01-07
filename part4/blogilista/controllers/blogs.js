@@ -1,6 +1,7 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const test = require("../utils/for_testing");
+const User = require("../models/user");
 
 //Get all blogs
 blogsRouter.get("/", async (req, res) => {
@@ -23,14 +24,21 @@ blogsRouter.get("/:id", async (req, res, next) => {
 blogsRouter.post("/", async (req, res, next) => {
   const body = req.body;
 
+  const user = await User.findById(body.userId);
+
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
     likes: body.likes || 0,
+    user: user._id,
   });
 
   const savedBlog = await blog.save();
+
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
+
   res.json(savedBlog.toJSON());
 });
 
@@ -46,15 +54,12 @@ blogsRouter.put("/:id", async (req, res, next) => {
     likes: body.likes || 0,
   };
 
-  Blog.findByIdAndUpdate(req.params.id, blog, {
+  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
     new: true,
     runValidators: true,
     context: "query",
-  })
-    .then((updatedBlog) => {
-      res.json(updatedBlog.toJSON());
-    })
-    .catch((err) => next(err));
+  });
+  res.status(200).json(updatedBlog.toJSON());
 });
 
 //Delete a Blog
