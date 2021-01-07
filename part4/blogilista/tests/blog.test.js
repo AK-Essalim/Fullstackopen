@@ -6,52 +6,11 @@ const api = supertest(app);
 const helper = require("./test_helper");
 
 const Blog = require("../models/blog");
-
-const initialBlogs = [
-  {
-    title: "started a new blog",
-    author: "Abdelkarim",
-    url: "http://AK-Essalim.com",
-    likes: 11,
-  },
-  {
-    title: "Work in progress",
-    author: "Osama",
-    url: "HTTP://localohost:2222",
-    likes: 4,
-  },
-  {
-    title: "Jaffa on Hyvää",
-    author: "Juice",
-    url: "www.jaffa.fi",
-    likes: 543,
-  },
-  {
-    title: "Got a new show with hubby",
-    author: "Wanda Maximoff",
-    url: "http://marvel.com",
-    likes: 5,
-  },
-  {
-    title: "Pizza, that's the title",
-    author: "Peter Parker",
-    url: "http://www.google.fi",
-    likes: 87,
-  },
-];
+const { map } = require("../app");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  let blogObject = new Blog(helper.initialBlogs[0]);
-  await blogObject.save();
-  blogObject = new Blog(helper.initialBlogs[1]);
-  await blogObject.save();
-  blogObject = new Blog(helper.initialBlogs[2]);
-  await blogObject.save();
-  blogObject = new Blog(helper.initialBlogs[3]);
-  await blogObject.save();
-  blogObject = new Blog(helper.initialBlogs[4]);
-  await blogObject.save();
+  await Blog.insertMany(helper.initialBlogs);
 });
 
 test("notes are returned as json", async () => {
@@ -73,7 +32,7 @@ test("the first note is about staring a blog", async () => {
   expect(response.body[0].title).toBe("started a new blog");
 });
 
-test("specific blog blog is within returned blogs", async () => {
+test("specific blog is within returned blogs", async () => {
   const response = await api.get("/api/blogs");
 
   const contents = response.body.map((r) => r.title);
@@ -96,7 +55,7 @@ test("A valid blog can be added", async () => {
     .expect("Content-Type", /application\/json/);
 
   const blogsAtEnd = await helper.blogsInDb();
-  expect(blogsAtEnd).toHaveLength(initialBlogs.length + 1);
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
 
   const contents = blogsAtEnd.map((r) => r.title);
 
@@ -110,7 +69,7 @@ test("blog without title is not added", async () => {
 
   await api.post("/api/blogs").send(newBlog).expect(400);
   const blogsAtEnd = await helper.blogsInDb();
-  expect(blogsAtEnd).toHaveLength(initialBlogs.length);
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 });
 
 test("Specific Blog can be viewed", async () => {
