@@ -6,8 +6,9 @@ const config = require("../utils/config");
 
 loginRouter.post("/", async (req, res) => {
   const body = req.body;
-
+  console.log("body: ", body);
   const user = await User.findOne({ username: body.username });
+  console.log("user: ", user);
   const passwordCorrect =
     user === null
       ? false
