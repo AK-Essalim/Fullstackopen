@@ -1,11 +1,25 @@
 const logger = require("./logger");
 
+const getTokenFrom = (req) => {
+  const authorization = req.get("authorization");
+  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
+    return authorization.substring(7);
+  }
+  return null;
+};
+
 const requestLogger = (request, response, next) => {
   logger.info("Method:", request.method);
   logger.info("Path:  ", request.path);
   logger.info("Body:  ", request.body);
   logger.info("Body:  ", request.authorization);
   logger.info("---");
+  next();
+};
+
+const tokenExtractor = (req, res, next) => {
+  req.token = getTokenFrom(req);
+
   next();
 };
 
@@ -23,7 +37,7 @@ const errorHandler = (error, request, response, next) => {
   }
 
   if (error.name === "JsonWebTokenError") {
-    return response.status(401).json({ error: "Access Denied" });
+    return response.status(401).json({ error: "incorrect token" });
   }
 
   console.error(error.message);
@@ -34,4 +48,5 @@ module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 };

@@ -7,6 +7,9 @@ const helper = require("./test_helper");
 
 const Blog = require("../models/blog");
 
+const headerAuth =
+  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImluIHllYXIgMzAwMCIsImlkIjoiNWZmNzhjNWI5NmM1M2ZiYmUwNTYxMzcwIiwiaWF0IjoxNjEwMDU5MTg5fQ.ILScC36agCM_pe72DR8ZIDvYJ1S9v9Al9mA-CuKIIxs";
+
 beforeEach(async () => {
   await Blog.deleteMany({});
   await Blog.insertMany(helper.initialBlogs);
@@ -79,6 +82,7 @@ describe("Posting data to the database/app", () => {
 
     await api
       .post("/api/blogs")
+      .set("Authorization", headerAuth)
       .send(newBlog)
       .expect(200)
       .expect("Content-Type", /application\/json/);
@@ -96,7 +100,12 @@ describe("Posting data to the database/app", () => {
       author: "Hela",
     };
 
-    await api.post("/api/blogs").send(newBlog).expect(400);
+    const request = await api
+      .post("/api/blogs")
+      .set("Authorization", headerAuth)
+      .send(newBlog)
+      .expect(400);
+    console.log("has auth header:: ", request.headers);
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
   });
@@ -127,7 +136,12 @@ describe("The app is working as expected", () => {
       url: "http://freedomFromSchool.com",
     };
 
-    const responseBlog = await api.post("/api/blogs").send(newBlog).expect(200);
+    const responseBlog = await api
+      .set("Authorization", headerAuth)
+      .post("/api/blogs")
+      .set("Authorization", headerAuth)
+      .send(newBlog)
+      .expect(200);
     console.log(responseBlog.body);
     expect(responseBlog.body.likes).toEqual(0);
   });

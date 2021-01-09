@@ -1,9 +1,9 @@
-POST http://localhost:3001/api/blogs HTTP/1.1
+PUT http://localhost:3001/api/blogs/5ff9317ccd1f1570eae01f74 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImluIHllYXIgMzAwMCIsImlkIjoiNWZmNzhjNWI5NmM1M2ZiYmUwNTYxMzcwIiwiaWF0IjoxNjEwMDU5MTg5fQ.ILScC36agCM_pe72DR8ZIDvYJ1S9v9Al9mA-CuKIIxs
 
 {
-    "title": "in year 3000",
+    "title": "Delete Test Success 3",
     "author": "Peter Petrelli",
     "url": "localhost:3002",
     "likes": 32

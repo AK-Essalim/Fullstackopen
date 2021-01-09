@@ -3,14 +3,6 @@ const Blog = require("../models/blog");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
-const getTokenFrom = (req) => {
-  const authorization = req.get("authorization");
-  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
-    return authorization.substring(7);
-  }
-  return null;
-};
-
 //Get all blogs
 
 blogsRouter.get("/", async (req, res) => {
@@ -21,7 +13,7 @@ blogsRouter.get("/", async (req, res) => {
 //Post a Blog
 blogsRouter.post("/", async (req, res, next) => {
   const body = req.body;
-  const token = getTokenFrom(req);
+  const token = req.token;
 
   const decodedToken = jwt.verify(token, process.env.SECRET);
   console.log("decoded token: ", decodedToken);
@@ -43,7 +35,7 @@ blogsRouter.post("/", async (req, res, next) => {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes === undefined ? 0 : body.likes,
+    likes: body.likes || 0,
     user: addedUser._id,
   });
 
@@ -54,26 +46,29 @@ blogsRouter.post("/", async (req, res, next) => {
 });
 
 blogsRouter.delete("/:id", async (req, res, next) => {
-  try {
-    const decodedToken = jwt.verify(req.token, process.env.SECRET);
-    if (!req.token || !decodedToken.id) {
-      return res.status(401).json({ error: "token missing or invalid" });
-    }
-
-    const currentBlog = await Blog.findById(req.params.id);
-    if (decodedToken.id.toString() !== currentBlog.user.toString()) {
-      return res.status(401).json({ error: "not authorized" });
-    }
-
-    await Blog.findByIdAndRemove(req.params.id);
-    res.status(204).end();
-  } catch (exception) {
-    next(exception);
+  const decodedToken = jwt.verify(req.token, process.env.SECRET);
+  if (!req.token || !decodedToken.id) {
+    return res.status(401).json({ error: "token missing or invalid" });
   }
+
+  const currentBlog = await Blog.findById(req.params.id);
+  if (decodedToken.id.toString() !== currentBlog.user.toString()) {
+    return res.status(401).json({ error: "not authorized" });
+  }
+
+  await Blog.findByIdAndRemove(req.params.id);
+  console.log("Blog deleted");
+  res.status(204).end();
 });
 
 blogsRouter.put("/:id", async (req, res, next) => {
   const body = req.body;
+  const decodedToken = jwt.verify(req.token, process.env.SECRET);
+  console.log("req params: ", req);
+  const currentBlog = await Blog.findById(req.params.id);
+  if (decodedToken.id.toString() !== currentBlog.user.toString()) {
+    return res.status(401).json({ error: "not authorized" });
+  }
 
   const blog = {
     title: body.title,
@@ -82,12 +77,9 @@ blogsRouter.put("/:id", async (req, res, next) => {
     likes: body.likes,
   };
 
-  try {
-    await Blog.findByIdAndUpdate(req.params.id, blog, { new: true });
-    res.status(200).end();
-  } catch (exception) {
-    next(exception);
-  }
+  await Blog.findByIdAndUpdate(req.params.id, blog, { new: true });
+
+  res.status(200).end();
 });
 
 module.exports = blogsRouter;
