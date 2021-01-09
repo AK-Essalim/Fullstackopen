@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const api = supertest(app);
+const config = require("../utils/config");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const helper = require("./test_helper");
 
@@ -9,12 +12,21 @@ const Blog = require("../models/blog");
 const User = require("../models/user");
 
 const headerAuth = "";
+let token;
 
 beforeEach(async () => {
+  // Initialized the first time
   await User.deleteMany({});
+  await User.insertMany(helper.initialUsers);
+  await Blog.deleteMany({});
   await Blog.insertMany(helper.initialBlogs);
-  await Blog.insertMany(helper.initialBlogs);
-  await Blog.insertMany(helper.initialBlogs);
+  const user = Blog.findOne({ username: "spiderman" });
+  const userForToken = {
+    username: user.username,
+    id: user._id,
+  };
+
+  token = jwt.sign(userForToken, process.env.SECRET);
 });
 
 describe("Accessing and viewing the data", () => {
@@ -63,12 +75,15 @@ test("specific blog is within returned blogs", async () => {
 test("Specific Blog can be viewed", async () => {
   const blogsAtStart = await helper.blogsInDb();
   const blogToView = blogsAtStart[0];
+  //console.log("specific test blog: ", blogToView);
+  const blogIndb = Blog.findOne({ title: blogToView.title });
 
   const resultBlog = await api
-    .get(`/api/blogs/${blogToView.id}`)
+    .get(`/api/blogs/${blogIndb.id}`)
     .expect(200)
     .expect("Content-Type", /application\/json/);
 
+  console.log("Result blog: ", resultBlog);
   const processedBlogToView = JSON.parse(JSON.stringify(blogToView));
   expect(resultBlog.body).toEqual(processedBlogToView);
 });
@@ -84,7 +99,7 @@ describe("Posting data to the database/app", () => {
 
     await api
       .post("/api/blogs")
-      .set("Authorization", headerAuth)
+      .set("Authorization", token)
       .send(newBlog)
       .expect(200)
       .expect("Content-Type", /application\/json/);
@@ -107,7 +122,7 @@ describe("Posting data to the database/app", () => {
       .set("Authorization", headerAuth)
       .send(newBlog)
       .expect(400);
-    console.log("has auth header:: ", request.headers);
+    console.log("has auth header: ", request.headers);
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
   });
@@ -118,7 +133,10 @@ describe("Deleting data from the APP correctly", () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogDelete = blogsAtStart[0];
 
-    await api.delete(`/api/blogs/${blogDelete.id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${blogDelete.id}`)
+      .set("Authorization", token)
+      .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
 
@@ -139,9 +157,8 @@ describe("The app is working as expected", () => {
     };
 
     const responseBlog = await api
-      .set("Authorization", headerAuth)
       .post("/api/blogs")
-      .set("Authorization", headerAuth)
+      .set("Authorization", token)
       .send(newBlog)
       .expect(200);
     console.log(responseBlog.body);

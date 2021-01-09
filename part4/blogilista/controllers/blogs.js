@@ -10,6 +10,14 @@ blogsRouter.get("/", async (req, res) => {
   res.json(blogs.map((blog) => blog.toJSON()));
 });
 
+blogsRouter.get("/:id", async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  if (blog) {
+    res.json(blog.toJSON());
+  }
+  res.status(404).end();
+});
+
 //Post a Blog
 blogsRouter.post("/", async (req, res, next) => {
   const body = req.body;
