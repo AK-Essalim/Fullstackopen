@@ -6,12 +6,14 @@ const api = supertest(app);
 const helper = require("./test_helper");
 
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
-const headerAuth =
-  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImluIHllYXIgMzAwMCIsImlkIjoiNWZmNzhjNWI5NmM1M2ZiYmUwNTYxMzcwIiwiaWF0IjoxNjEwMDU5MTg5fQ.ILScC36agCM_pe72DR8ZIDvYJ1S9v9Al9mA-CuKIIxs";
+const headerAuth = "";
 
 beforeEach(async () => {
-  await Blog.deleteMany({});
+  await User.deleteMany({});
+  await Blog.insertMany(helper.initialBlogs);
+  await Blog.insertMany(helper.initialBlogs);
   await Blog.insertMany(helper.initialBlogs);
 });
 

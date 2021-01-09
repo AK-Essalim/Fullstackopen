@@ -6,6 +6,12 @@ const Blog = require("../models/blog");
 usersRouter.post("/", async (req, res) => {
   const body = req.body;
   const saltRounds = 10;
+  if ((body.password.length || body.username.length) < 3) {
+    return res
+      .status(400)
+      .json({ error: "username and/or password is too short" });
+  }
+
   const passwordHash = await bcrypt.hash(body.password, saltRounds);
   console.log(body);
 

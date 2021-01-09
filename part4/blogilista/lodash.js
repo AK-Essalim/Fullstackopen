@@ -58,15 +58,24 @@ const blogs = [
 console.log("väliä");
 console.log(_.sortBy(blogs, ["likes"])); */
 let v = _.sortBy(blogs, (a) => a.author);
-//console.log(v);
-let q = _.groupBy(blogs, (blog) => blog.author);
+let authorLikes = [];
 
-Object.entries(v).map((a) => console.log(a).length);
+let q = _.groupBy(blogs, (blog) => blog.author);
+// let s = q.map((item) => {
+//   let a = {
+//     name: item.author,
+//   };
+//   authorLikes.concat(a);
+// });
+let z = _.forEach(q, (value, key) => authorLikes.push(value));
+
+console.log(z);
+//Object.entries(v).map((a) => console.log(a).length);
 
 const byAuthor = _.groupBy(blogs, (blog) => blog.author);
 const authors = _.map(byAuthor, (auth) => {
   const likes = auth.reduce((total, blog) => total + blog.likes, 0);
-  return { author: auth[0].author, likes: likes };
+  //return { author: auth[0].author, likes: likes };
 });
 /* console.log(
   authors.reduce((max, auth) => (max.likes > auth.likes ? max : auth), {})
