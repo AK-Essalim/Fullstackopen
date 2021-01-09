@@ -24,10 +24,9 @@ blogsRouter.post("/", async (req, res, next) => {
   const token = req.token;
 
   const decodedToken = jwt.verify(token, process.env.SECRET);
-  console.log("decoded token: ", decodedToken);
 
   if (!token || !decodedToken.id) {
-    console.log("token missing: ", body);
+    //console.log("token missing: ", body);
 
     return res.status(401).json({ error: "token missing or invalid" });
   }
@@ -72,7 +71,7 @@ blogsRouter.delete("/:id", async (req, res, next) => {
 blogsRouter.put("/:id", async (req, res, next) => {
   const body = req.body;
   const decodedToken = jwt.verify(req.token, process.env.SECRET);
-  console.log("req params: ", req);
+  //console.log("req params: ", req);
   const currentBlog = await Blog.findById(req.params.id);
   if (decodedToken.id.toString() !== currentBlog.user.toString()) {
     return res.status(401).json({ error: "not authorized" });

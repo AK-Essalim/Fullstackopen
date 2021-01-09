@@ -13,14 +13,14 @@ usersRouter.post("/", async (req, res) => {
   }
 
   const passwordHash = await bcrypt.hash(body.password, saltRounds);
-  console.log(body);
+  //console.log(body);
 
   const user = new User({
     username: body.username,
     name: body.name,
     passwordHash,
   });
-  console.log(passwordHash);
+  //console.log(passwordHash);
   const savedUser = await user.save();
   res.json(savedUser);
 });

@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const api = supertest(app);
-const config = require("../utils/config");
-const bcrypt = require("bcrypt");
+
 const jwt = require("jsonwebtoken");
 
 const helper = require("./test_helper");
@@ -11,22 +10,23 @@ const helper = require("./test_helper");
 const Blog = require("../models/blog");
 const User = require("../models/user");
 
-const headerAuth = "";
 let token;
+let userForToken;
 
 beforeEach(async () => {
   // Initialized the first time
   await User.deleteMany({});
-  await User.insertMany(helper.initialUsers);
+  const z = await User.insertMany(helper.initialUsers);
   await Blog.deleteMany({});
   await Blog.insertMany(helper.initialBlogs);
-  const user = Blog.findOne({ username: "spiderman" });
-  const userForToken = {
+  const user = await User.findOne({ username: "spiderman" });
+  //console.log("user for token: ", user);
+  userForToken = {
     username: user.username,
     id: user._id,
   };
 
-  token = jwt.sign(userForToken, process.env.SECRET);
+  token = "Bearer " + jwt.sign(userForToken, process.env.SECRET);
 });
 
 describe("Accessing and viewing the data", () => {
@@ -47,7 +47,6 @@ describe("Accessing and viewing the data", () => {
 
   test("fails with statuscode 400 id is invalid", async () => {
     const invalidId = "5a3d5da59070081a82a3445";
-
     await api.get(`/api/blogs/${invalidId}`).expect(400);
   });
 });
@@ -75,15 +74,12 @@ test("specific blog is within returned blogs", async () => {
 test("Specific Blog can be viewed", async () => {
   const blogsAtStart = await helper.blogsInDb();
   const blogToView = blogsAtStart[0];
-  //console.log("specific test blog: ", blogToView);
-  const blogIndb = Blog.findOne({ title: blogToView.title });
 
   const resultBlog = await api
-    .get(`/api/blogs/${blogIndb.id}`)
+    .get(`/api/blogs/${blogToView.id}`)
     .expect(200)
     .expect("Content-Type", /application\/json/);
 
-  console.log("Result blog: ", resultBlog);
   const processedBlogToView = JSON.parse(JSON.stringify(blogToView));
   expect(resultBlog.body).toEqual(processedBlogToView);
 });
@@ -119,23 +115,45 @@ describe("Posting data to the database/app", () => {
 
     const request = await api
       .post("/api/blogs")
-      .set("Authorization", headerAuth)
+      .set("Authorization", token)
       .send(newBlog)
       .expect(400);
-    console.log("has auth header: ", request.headers);
+    //console.log("has auth header: ", request.headers);
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
   });
 });
 
 describe("Deleting data from the APP correctly", () => {
-  test("blog can be deleted", async () => {
+  test("blog can be deleted when correctly used", async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogDelete = blogsAtStart[0];
+    // Update the blogs user to one that exists in DB
+    /*const blogi = Blog.findById(blogDelete.id);
+
+    blogi.user = userForToken.id;
+    await bloki.save();*/
+    console.log("user for token ", userForToken);
+    const blogi = await Blog.findByIdAndUpdate(
+      blogDelete.id,
+      {
+        user: userForToken.id,
+      },
+      { new: true }
+    );
+
+    console.log("blogi: ", blogi);
+    //console.log("user for token: ", user);
+    // const userForToken = {
+    //   username: user.username,
+    //   id: user._id,
+    // };
+
+    let tokenDelete = "Bearer " + jwt.sign(userForToken, process.env.SECRET);
 
     await api
       .delete(`/api/blogs/${blogDelete.id}`)
-      .set("Authorization", token)
+      .set("Authorization", tokenDelete)
       .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
@@ -155,19 +173,19 @@ describe("The app is working as expected", () => {
       author: "Hela",
       url: "http://freedomFromSchool.com",
     };
-
+    console.log("token: ", token);
     const responseBlog = await api
       .post("/api/blogs")
       .set("Authorization", token)
       .send(newBlog)
       .expect(200);
-    console.log(responseBlog.body);
+    //console.log(responseBlog.body);
     expect(responseBlog.body.likes).toEqual(0);
   });
 
   test("Expect id to be defined", async () => {
     const responseBlog = await api.get("/api/blogs").expect(200);
-    console.log(responseBlog.body);
+    // console.log(responseBlog.body);
     expect(responseBlog.body[0].id).toBeDefined();
   });
 
