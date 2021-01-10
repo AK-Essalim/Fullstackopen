@@ -3,7 +3,8 @@ const baseUrl = 'api/login'
 
 const login = async (creds) => {
   const res = await axios.post(baseUrl, creds)
+  console.log(creds)
   return res.data
 }
 
-export default login
+export default { login }

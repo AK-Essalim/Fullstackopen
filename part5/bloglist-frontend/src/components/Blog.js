@@ -1,9 +1,12 @@
 import React from 'react'
-const Blog = ({ blog, addLike }) => (
-  <li>
-    {blog.title} {blog.author}
-    <button onClick={addLike}>like</button>
-  </li>
-)
+
+const Blog = ({ blog, addLikeTo }) => {
+  return (
+    <li>
+      {blog.title} {blog.author} {blog.likes}
+      <button onClick={() => addLikeTo(blog.id)}>like</button>
+    </li>
+  )
+}
 
 export default Blog

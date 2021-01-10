@@ -11,9 +11,9 @@ import './App.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  // const [newTitle, setNewTitle] = useState('')
-  // const [newAuthor, setNewAuthor] = useState('')
-  // const [newUrl, setNewUrl] = useState('')
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
   //const [newBlog, setNewBlog] = useState('')
   //const [newBlog, setNewBlog] = useState('')
   //const [showAll, setShowAll] = useState(false)
@@ -21,24 +21,40 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
+  useEffect(() => {
+    const loggedUser = window.localStorage.getItem('loggedBlogappUser')
+    if (loggedUser) {
+      const userData = JSON.parse(loggedUser)
+      setUser(userData)
+      blogService.setToken(userData.token)
+    }
+  }, [])
+  useEffect(() => {
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+  }, [errorMessage])
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
+      const user = await loginService.login({
+        username,
+        password,
+      })
+      console.log(user)
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (err) {
-      setErrorMessage('wrong credentials')
+      setErrorMessage(error.response.data.error)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -48,30 +64,35 @@ const App = () => {
   const addLikeTo = (id) => {
     const blog = blogs.find((b) => b.id === id)
     let likey = blog.likes + 1
-    console.log(likey, blog)
+    //console.log('problem here', likey, blog)
     const updatedBlog = { ...blog, likes: likey }
 
+    //console.log(updatedBlog)
     blogService
       .update(id, updatedBlog)
       .then((returnBlog) => {
-        setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnBlog)))
+        console.log(returnBlog)
+        setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnBlog.data)))
       })
-      .catch((err) => {
-        setErrorMessage(`Blog ${blog.id} was already deleted from server`)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
+      .catch((error) => {
+        setErrorMessage(error.response.data.error)
       })
   }
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value)
-  }
-  const handleAuthorChange = (e) => {
-    setTitle(e.target.value)
-  }
-  const handleUrlChange = (e) => {
-    setUrl(e.target.value)
+  // const handleTitleChange = (e) => {
+  //   setTitle(e.target.value)
+  // }
+  // const handleAuthorChange = (e) => {
+  //   setTitle(e.target.value)
+  // }
+  // const handleUrlChange = (e) => {
+  //   setUrl(e.target.value)
+  // }
+  const handleLogout = () => {
+    setUser(null)
+    setUsername('')
+    setPassword('')
+    localStorage.clear()
   }
 
   const addBlog = (e) => {
@@ -83,12 +104,17 @@ const App = () => {
       likes: 0,
     }
 
-    blogService.create(blogObject).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-    })
+    blogService
+      .create(blogObject)
+      .then((returnedBlog) => {
+        setBlogs(blogs.concat(returnedBlog))
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+      })
+      .catch((error) => {
+        setErrorMessage(error.response.data.error)
+      })
   }
   const error = 'error'
 
@@ -101,29 +127,28 @@ const App = () => {
           handleLogin={handleLogin}
           setUsername={setUsername}
           setPassword={setPassword}
+          username={username}
+          password={password}
         />
       ) : (
         <div>
-          <p>{user.name} logged in</p>
+          <p>
+            {user.name} logged in
+            <button onClick={handleLogout}>logout</button>
+          </p>
           <BlogForm
-            handleTitleChange={handleTitleChange}
-            handleAuthorChange={handleAuthorChange}
-            handleUrlChange={handleUrlChange}
+            setTitle={setTitle}
+            setAuthor={setAuthor}
+            setUrl={setUrl}
             addBlog={addBlog}
             title={title}
             author={author}
             url={url}
+            blogs={blogs}
+            addLikeTo={addLikeTo}
           />
         </div>
       )}
-
-      <h2>Blogs</h2>
-
-      <ul>
-        {blogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} addLike={() => addLikeTo(blog.id)} />
-        ))}
-      </ul>
     </div>
   )
 }
