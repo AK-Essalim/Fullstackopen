@@ -21,6 +21,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -37,6 +38,7 @@ const App = () => {
   useEffect(() => {
     setTimeout(() => {
       setErrorMessage(null)
+      setError(null)
     }, 5000)
   }, [errorMessage])
 
@@ -47,17 +49,15 @@ const App = () => {
         username,
         password,
       })
-      console.log(user)
+      console.log('error: ', user)
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (err) {
-      setErrorMessage(error.response.data.error)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      setError('error')
+      setErrorMessage(err.response.data.error)
     }
   }
 
@@ -69,12 +69,13 @@ const App = () => {
 
     //console.log(updatedBlog)
     blogService
-      .update(id, updatedBlog)
+      .like(id, updatedBlog)
       .then((returnBlog) => {
         console.log(returnBlog)
         setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnBlog.data)))
       })
       .catch((error) => {
+        setError('error')
         setErrorMessage(error.response.data.error)
       })
   }
@@ -111,12 +112,15 @@ const App = () => {
         setTitle('')
         setAuthor('')
         setUrl('')
+        setError('notification')
+        setErrorMessage(
+          `a new blog "${returnedBlog.title}" by ${returnedBlog.author}`
+        )
       })
       .catch((error) => {
         setErrorMessage(error.response.data.error)
       })
   }
-  const error = 'error'
 
   return (
     <div>

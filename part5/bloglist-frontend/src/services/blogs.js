@@ -27,5 +27,12 @@ const update = (id, newObject) => {
   const req = axios.put(`${baseUrl}/${id}`, newObject, config)
   return req
 }
+const like = (id, newObject) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const req = axios.put(`${baseUrl}/${id}/like`, newObject, config)
+  return req
+}
 
-export default { getAll, create, update, setToken }
+export default { getAll, create, update, setToken, like }
