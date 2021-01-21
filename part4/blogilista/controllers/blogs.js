@@ -90,4 +90,27 @@ blogsRouter.put('/:id', async (req, res, next) => {
     res.status(200).json(newBlog.toJSON())
 })
 
+blogsRouter.put('/:id/like', async (req, res, next) => {
+    const body = req.body
+    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    console.log("req params: ", req.params.id);
+    
+    const currentBlog = await Blog.findById(req.params.id)
+  
+const likes = body.likes + 1
+    const blog = {
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: likes,
+    }
+
+    if(decodedToken.id) {
+        const newBlog = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
+
+
+    res.status(200).json(newBlog.toJSON())
+    }
+})
+
 module.exports = blogsRouter
